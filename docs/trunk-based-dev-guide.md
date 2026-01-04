@@ -75,8 +75,10 @@ Trunk-based development is a version control strategy where all developers work 
 
 4. **Push Your Branch**
    ```bash
-   git push origin feature/your-feature-name
+   git push -u origin feature/your-feature-name
    ```
+   - The `-u` flag sets up "upstream tracking" so future pushes can just use `git push`
+   - After this first push, you can use `git push` for subsequent commits
 
 5. **Create a Pull Request**
    - See detailed instructions in the "Creating a Pull Request" section below
@@ -222,8 +224,9 @@ After you've pushed your branch to GitHub, you need to create a Pull Request (PR
      ```bash
      git add .
      git commit -m "Address review feedback: improve error handling"
-     git push origin feature/your-feature-name
+     git push
      ```
+   - After the first push with `-u`, you can just use `git push` for subsequent commits
    - The PR will automatically update with your new commits
 
 4. **Get Approval**
@@ -545,8 +548,9 @@ Use this if you have uncommitted changes but haven't committed anything to main 
 
 3. **Push the new branch:**
    ```bash
-   git push origin feature/your-feature-name
+   git push -u origin feature/your-feature-name
    ```
+   - The `-u` flag sets up upstream tracking so future pushes can use `git push`
 
 4. **Switch back to main and verify it's clean:**
    ```bash
@@ -599,8 +603,10 @@ Use this if you have already committed changes to your local main branch.
 7. **Push your feature branch:**
    ```bash
    git checkout feature/your-feature-name
-   git push origin feature/your-feature-name
+   git push -u origin feature/your-feature-name
    ```
+   - The `-u` flag sets up "upstream tracking" so you can use `git push` in the future
+   - After the first push, you can just use `git push` (no need to specify the remote and branch)
 
 8. **Verify main is clean:**
    ```bash
@@ -696,7 +702,8 @@ git checkout -b feature/your-feature
 # During work
 git add .
 git commit -m "Clear commit message"
-git push origin feature/your-feature
+git push -u origin feature/your-feature  # First push only (sets up tracking)
+# After first push, just use: git push
 
 # After PR is merged
 git checkout main
