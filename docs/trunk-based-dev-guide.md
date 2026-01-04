@@ -606,9 +606,19 @@ Use this if you have already committed changes to your local main branch.
    ```bash
    git checkout main
    git status
+   ```
+   
+   **What to look for:**
+   - `git status` should show: `Your branch is up to date with 'origin/main'` and `nothing to commit, working tree clean`
+   - This means your local main branch matches the remote main branch, and all your work is safely on your feature branch
+   
+   **Optional - Check your feature branch has your work:**
+   ```bash
+   git checkout feature/your-feature-name
    git log --oneline -5
    ```
-   - Main should be back to its original state (matching remote)
+   - You should see your commits (the ones you wanted to move) listed here
+   - This confirms your work is on the feature branch where it belongs
 
 9. **Create a Pull Request** from your feature branch as normal
 
