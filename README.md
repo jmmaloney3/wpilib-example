@@ -5,6 +5,9 @@ This repository contains:
 * Process documentation
 * Tutorials
 
+## Trunk Based Development
+See `docs/trunk-based-dev-guide.md` for information about trunk based development.
+
 ## Build Configuration Files
 
 This project uses Gradle as its build system. The following files are essential build configuration files that **must be committed to version control**:
