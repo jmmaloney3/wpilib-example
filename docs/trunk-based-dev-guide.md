@@ -136,13 +136,10 @@ After you've pushed your branch to GitHub, you need to create a Pull Request (PR
 
 1. **Navigate to Your Repository**
    - Go to your GitHub repository in a web browser
-   - You should see a yellow banner at the top saying "Your recently pushed branches" with your branch name
-   - Click the **"Compare & pull request"** button
-
-   OR
-
    - Click on the **"Pull requests"** tab at the top of the repository
    - Click the green **"New pull request"** button
+   
+   **Note:** Sometimes GitHub shows a yellow banner at the top saying "Your recently pushed branches" with a "Compare & pull request" button. If you see this, you can click it for a shortcut, but the method above always works.
 
 2. **Select Your Branches**
    - **Base branch**: Should be `main` (or `master`)
@@ -150,11 +147,19 @@ After you've pushed your branch to GitHub, you need to create a Pull Request (PR
    - GitHub will show you a comparison of the changes
 
 3. **Review Your Changes**
-   - Scroll down to see the "Files changed" tab
-   - Verify that all your changes are included
-   - Make sure you haven't accidentally included unrelated files
+   - GitHub will show you a comparison view with:
+     - A list of commits at the top
+     - File diffs below showing what changed (additions in green, deletions in red)
+   - Scroll through the changes to verify:
+     - All your intended changes are included
+     - You haven't accidentally included unrelated files
+   - **Note:** After the PR is created, you'll see a "Files changed" tab in the PR detail view, but during creation you'll see the comparison view described above
 
-4. **Fill Out the Pull Request Form**
+4. **Click "Create pull request"**
+   - Click the green **"Create pull request"** button near the top of the page
+   - This will take you to the pull request form where you can add a title and description
+
+5. **Fill Out the Pull Request Form**
 
    **Title** (required):
    - Write a clear, descriptive title
@@ -189,13 +194,13 @@ After you've pushed your branch to GitHub, you need to create a Pull Request (PR
    Addresses #15
    ```
 
-5. **Request Reviewers**
+6. **Request Reviewers**
    - On the right sidebar, click **"Reviewers"**
    - Select at least one team member (or team lead) to review your code
    - You can request multiple reviewers if needed
    - Consider requesting someone familiar with the subsystem you're modifying
 
-6. **Add Labels** (optional but helpful)
+7. **Add Labels** (optional but helpful)
    - Click **"Labels"** on the right sidebar
    - Add relevant labels like:
      - `feature` - For new features
@@ -203,8 +208,8 @@ After you've pushed your branch to GitHub, you need to create a Pull Request (PR
      - `documentation` - For docs updates
      - `subsystem:drivetrain` - For subsystem-specific labels
 
-7. **Create the Pull Request**
-   - Click the green **"Create pull request"** button
+8. **Create the Pull Request**
+   - Click the green **"Create pull request"** button at the bottom of the form
    - Your PR is now created and reviewers will be notified
 
 ### After Creating the Pull Request
