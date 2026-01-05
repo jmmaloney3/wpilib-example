@@ -5,6 +5,8 @@ This repository contains:
 * Process documentation
 * Tutorials
 
+Adding this to intentionally create a merge conflict!!! (Change A)
+
 ## Trunk Based Development
 See `docs/trunk-based-dev-guide.md` for information about trunk based development.  This documentation describes
 the team's procedures for managing code in git.
