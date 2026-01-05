@@ -308,15 +308,17 @@ git push
 ### Using GitHub Desktop
 
 **First push:**
-1. After making commits, click **"Publish branch"** in the top toolbar
-2. GitHub Desktop will ask if you want to create a pull request
+1. After making commits, look in the main content area (you'll see "No local changes" message)
+2. Click the **"Publish branch"** button
+3. GitHub Desktop will ask if you want to create a pull request
    - You can create PR now or do it later on GitHub
-3. Branch is now on GitHub
+4. Branch is now on GitHub
 
 **Subsequent pushes:**
-1. After making new commits, click **"Push origin"** in the top toolbar
-2. Commits are uploaded to GitHub
-3. Your pull request (if you have one) updates automatically
+1. After making new commits, look in the main content area
+2. Click the **"Push origin"** button
+3. Commits are uploaded to GitHub
+4. Your pull request (if you have one) updates automatically
 
 **Visual indicators:**
 - "Publish branch" appears for new branches

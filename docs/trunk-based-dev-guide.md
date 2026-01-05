@@ -156,10 +156,11 @@ Follow these steps each time you start working on a new feature or fix.
    <details>
    <summary>Using GitHub Desktop</summary>
    
-   - Click **"Publish branch"** button in the top toolbar
+   - Look in the main content area (you'll see "No local changes" message)
+   - Click the **"Publish branch"** button
    - GitHub Desktop will ask if you want to create a pull request
    - You can click "Create Pull Request" now, or do it later on GitHub
-   - After the first push, use **"Push origin"** for future commits
+   - After the first push, use **"Push origin"** for future commits (also in the main content area)
    </details>
 
 5. **Create a Pull Request**
@@ -337,7 +338,7 @@ After you've pushed your branch to GitHub, you need to create a Pull Request (PR
      - **Summary** (required): Short description (e.g., "Address review feedback: improve error handling")
      - **Description** (optional): Add more details if needed
    - Click **"Commit to [branch-name]"**
-   - Click **"Push origin"** to upload your changes
+   - Click **"Push origin"** button (in the main content area) to upload your changes
    - Your PR will automatically update with the new commit
    </details>
 
@@ -809,7 +810,8 @@ Use this if you have uncommitted changes but haven't committed anything to main 
    <details>
    <summary>Using GitHub Desktop</summary>
    
-   - Click **"Publish branch"** in the top toolbar
+   - Look in the main content area (you'll see "No local changes" message)
+   - Click the **"Publish branch"** button
    - GitHub Desktop will ask if you want to create a pull request
    - You can create the PR now or do it later on GitHub
    </details>
@@ -974,7 +976,7 @@ Use this if you have already committed changes to your local main branch.
    <summary>Using GitHub Desktop</summary>
    
    - Switch back to your feature branch (click branch dropdown, select your feature branch)
-   - Click **"Publish branch"** in the top toolbar
+   - Look in the main content area and click the **"Publish branch"** button
    - GitHub Desktop will ask if you want to create a pull request
    </details>
 
