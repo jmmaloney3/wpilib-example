@@ -2,7 +2,7 @@
 
 ## What is Trunk-Based Development?
 
-Trunk-based development is a version control strategy where all developers work on a single branch (called "main" or "trunk") and integrate their changes frequently. Instead of maintaining long-lived feature branches, developers create short-lived branches for their work and merge them back to main quickly after code review.
+Trunk-based development is a version control strategy where all developers work on a single branch (usually called "main") and integrate their changes frequently. Instead of maintaining long-lived feature branches, developers create short-lived branches for their work and merge them back to main quickly after code review.
 
 ## Core Principles
 
@@ -42,55 +42,139 @@ Trunk-based development is a version control strategy where all developers work 
 
 ### Daily Workflow
 
+Follow these steps each time you start working on a new feature or fix.
+
 1. **Start Your Day**
+   - Switch to main branch and get the latest changes from your team
+   - This ensures you're starting from the most current codebase
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git checkout main
    git pull origin main
    ```
-   - `git checkout main` - Switches to the `main` branch (makes it your active branch)
-   - `git pull origin main` - Downloads and merges the latest changes from the remote `main` branch
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Open GitHub Desktop
+   - Click the **"Current branch"** dropdown in the top toolbar
+   - Select **"main"** from the list
+   - Click **"Fetch origin"** to check for updates
+   - If updates are available, click **"Pull origin"** to download and merge them
+   - You'll see a notification if your local main is now behind the remote
+   </details>
 
 2. **Create a Feature Branch**
+   - Create a new branch for your work (never code directly on main)
+   - Use descriptive names that explain what you're working on
+   - Keep each branch focused on one feature or fix
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git checkout -b feature/your-feature-name
    ```
-   - `git checkout -b` - Creates a new branch and switches to it (the `-b` flag means "create branch")
-   - Use descriptive names: `feature/drive-base`, `feature/arm-control`, `feature/autonomous-route-1`
-   - Keep branches focused on one feature or fix
    
-   **What `git checkout` does:**
-   - Switches your working directory to a different branch
-   - Updates your files to match that branch's state
-   - Makes that branch your "active" branch (where new commits will go)
-   - `git checkout -b` creates a new branch and switches to it in one command
+   **Naming examples:**
+   - `feature/drive-base` - New drive base subsystem
+   - `feature/arm-control` - Arm control improvements
+   - `feature/autonomous-route-1` - Specific autonomous routine
+   - `fix/encoder-drift` - Bug fix for encoder issue
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Click the **"Current branch"** dropdown in the top toolbar
+   - Click **"New branch"** at the bottom of the dropdown
+   - Enter your branch name: `feature/your-feature-name`
+   - Make sure **"main"** is selected as the branch to base it on
+   - Click **"Create branch"**
+   - You're now on your new branch (you'll see the branch name in the top toolbar)
+   
+   **Naming examples:**
+   - `feature/drive-base` - New drive base subsystem
+   - `feature/arm-control` - Arm control improvements
+   - `fix/encoder-drift` - Bug fix for encoder issue
+   </details>
 
 3. **Make Your Changes**
-   - Write code, test locally, commit frequently
-   - Write clear commit messages:
-     ```
-     Add PID controller for arm position
-     Fix drive base encoder calibration
-     Update autonomous routine for scoring
-     ```
+   - Write your code, test it locally, and commit frequently
+   - Write clear commit messages that explain what each commit does
+   - Small, frequent commits are easier to review and debug
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
+   ```bash
+   # After making changes to files
+   git add path/to/changed/file.java  # Add specific files (safer)
+   # OR: git add -u  # Only modified tracked files
+   git commit -m "Add PID controller for arm position"
+   ```
+   
+   **Good commit message examples:**
+   - "Add PID controller for arm position"
+   - "Fix drive base encoder calibration"
+   - "Update autonomous routine for scoring"
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Make your code changes in your editor
+   - GitHub Desktop will show your changes in the left sidebar
+   - Review the changes in the diff view (green = additions, red = deletions)
+   - Check the boxes next to files you want to commit (or check "Select all")
+   - Write a commit message:
+     - **Summary** (required): Short description of what the commit does
+     - **Description** (optional): Press Enter twice or click in the description field to add more details
+   - Click **"Commit to [branch-name]"**
+   - Repeat as you make more changes
+   </details>
 
 4. **Push Your Branch**
+   - Upload your branch to GitHub so others can see it
+   - First push sets up tracking so future pushes are simpler
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git push -u origin feature/your-feature-name
    ```
-   - The `-u` flag sets up "upstream tracking" so future pushes can just use `git push`
-   - After this first push, you can use `git push` for subsequent commits
+   
+   - The `-u` flag sets up "upstream tracking"
+   - After this first push, you can just use `git push` for subsequent commits
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Look in the main content area (you'll see "No local changes" message)
+   - Click the **"Publish branch"** button
+   - GitHub Desktop will ask if you want to create a pull request
+   - You can click "Create Pull Request" now, or do it later on GitHub
+   - After the first push, use **"Push origin"** for future commits (also in the main content area)
+   </details>
 
 5. **Create a Pull Request**
    - See detailed instructions in the "Creating a Pull Request" section below
+   - This is where your code gets reviewed before merging to main
 
 6. **Address Review Feedback**
-   - Make requested changes
+   - Make any requested changes
    - Push updates to your branch (the PR updates automatically)
-   - Respond to comments and questions
+   - Respond to comments and questions professionally
 
 7. **Merge After Approval**
-   - Once approved, merge the PR
-   - Delete the feature branch after merging
+   - Once your PR is approved, merge it to main
+   - Delete the feature branch after merging (GitHub will offer this)
    - Pull the latest main branch to start your next feature
 
 ### Branch Naming Conventions
@@ -224,20 +308,39 @@ After you've pushed your branch to GitHub, you need to create a Pull Request (PR
    - Be professional and open to feedback
 
 3. **Update Your PR** (if changes are needed)
-   - Make changes to your code locally
-   - Commit and push to the same branch:
-     ```bash
-     # Add specific files you changed (safer)
-     git add path/to/file1.java path/to/file2.java
-     # OR if you only modified tracked files (not adding new files):
-     git add -u
-     # Then commit and push
-     git commit -m "Address review feedback: improve error handling"
-     git push
-     ```
+   - Make changes to your code locally and push them to the same branch
+   - The PR will automatically update with your new commits
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
+   ```bash
+   # Add specific files you changed (safer)
+   git add path/to/file1.java path/to/file2.java
+   # OR if you only modified tracked files (not adding new files):
+   git add -u
+   # Then commit and push
+   git commit -m "Address review feedback: improve error handling"
+   git push
+   ```
+   
    - **Note:** Avoid `git add .` unless you're certain there are no untracked files that shouldn't be committed
    - After the first push with `-u`, you can just use `git push` for subsequent commits
-   - The PR will automatically update with your new commits
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Make your code changes in your editor
+   - GitHub Desktop will show your changes in the left sidebar
+   - Review the changes, check the files you want to commit
+   - Write a commit message:
+     - **Summary** (required): Short description (e.g., "Address review feedback: improve error handling")
+     - **Description** (optional): Add more details if needed
+   - Click **"Commit to [branch-name]"**
+   - Click **"Push origin"** button (in the main content area) to upload your changes
+   - Your PR will automatically update with the new commit
+   </details>
 
 4. **Get Approval**
    - Once a reviewer approves your PR, you'll see a green checkmark
@@ -541,28 +644,42 @@ If you set up continuous integration (CI):
 First, let's check what state you're in:
 
 1. **Check what branch you're on:**
+   - Determine if you're on main or a feature branch
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git branch
    ```
    - If you see `* main`, you're on the main branch
    - If you see `* feature/...`, you're already on a feature branch (no action needed!)
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Look at the top toolbar in GitHub Desktop
+   - The current branch name is shown in the **"Current branch"** dropdown
+   - If it says "main", you're on the main branch
+   - If it shows a feature branch name, you're already on a feature branch (no action needed!)
+   </details>
 
 2. **Check if you have commits on local main that aren't on remote main:**
+   - Determine if you've committed changes to local main that aren't on GitHub yet
+   - This is the most important check - it determines which solution to use
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git fetch origin
    git log origin/main..main --oneline
    ```
    
-   **What this command does:**
-   - `git fetch origin` - Downloads the latest information about the remote repository (but doesn't change your local files)
-   - `git log origin/main..main --oneline` - Shows commits that are in your local `main` branch but NOT in the remote `origin/main` branch
-     - The `..` syntax means "show commits in the second branch that aren't in the first branch"
-     - `--oneline` shows a compact one-line format for each commit
-   
    **What to look for:**
    - If this shows commits (you'll see commit messages), you have local commits on main that aren't on the remote
    - If this shows nothing (empty output), your local main matches the remote (no commits on main)
-   - **This is the most important check** - it determines which solution to use
    
    **Example output if you have commits:**
    ```
@@ -570,14 +687,38 @@ First, let's check what state you're in:
    def5678 Fix encoder calibration
    ```
    This means you made 2 commits on your local main that aren't on the remote yet.
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Make sure you're on the main branch (check the branch dropdown)
+   - Look at the top toolbar or commit history in the left sidebar
+   - **If you see "X commits ahead"** or a **"Push origin"** button, you have local commits on main
+   - **If you don't see those indicators**, you likely don't have local commits on main
+   - **To double-check:** Compare the most recent commit message in GitHub Desktop with the most recent commit on GitHub (go to your repository on GitHub.com, the main branch page shows the latest commit at the top)
+   </details>
 
 3. **Check if you have uncommitted changes:**
+   - Determine if you have files you've modified but haven't committed yet
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git status
    ```
    - If you see "Changes not staged for commit" or "Untracked files", you have uncommitted changes
    - **Note**: You can have uncommitted changes even if you've already committed other changes to main
-   - Uncommitted changes are files you've modified but haven't committed yet
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Look at the left sidebar in GitHub Desktop
+   - If you see files listed under "Changes" (with checkboxes), you have uncommitted changes
+   - If the sidebar shows "No local changes", you don't have any uncommitted changes
+   </details>
 
 **Step 2: Choose the Correct Solution**
 
@@ -600,13 +741,38 @@ Based on your findings from Step 1:
 
 Use this if you have uncommitted changes but haven't committed anything to main yet.
 
-1. **Create a new branch from your current position** (this moves your uncommitted changes to the new branch):
+1. **Create a new branch from your current position**
+   - This moves your uncommitted changes to the new branch
+   - Your uncommitted changes will come with you automatically
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git checkout -b feature/your-feature-name
    ```
-   - Your uncommitted changes will come with you to the new branch
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Click the **"Current branch"** dropdown
+   - Click **"New branch"**
+   - Enter your branch name: `feature/your-feature-name`
+   - Make sure **"main"** is selected as the base branch
+   - Click **"Create branch"**
+   - If a "Switch Branch" dialog appears, select **"Bring my changes to [new-branch-name]"**
+     - This moves your uncommitted changes to the new branch (which is what we want)
+     - Do NOT select "Leave my changes on main" - that would keep them on main
+   - Your uncommitted changes will now be on the new branch
+   </details>
 
 2. **Commit your changes on the new branch:**
+   - Save your work by committing it to the new branch
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    # Add specific files you changed (recommended)
    git add path/to/file1.java path/to/file2.java
@@ -616,19 +782,61 @@ Use this if you have uncommitted changes but haven't committed anything to main 
    git commit -m "Your commit message"
    ```
    - **Note:** Use `git add .` only if you're certain all files in the directory should be committed
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Your uncommitted changes should already be visible in the left sidebar
+   - Review the changes, check the files you want to commit
+   - Write a commit message:
+     - **Summary** (required): Short description of what the commit does
+     - **Description** (optional): Press Enter twice or click in the description field to add more details
+   - Click **"Commit to [branch-name]"**
+   </details>
 
 3. **Push the new branch:**
+   - Upload your branch to GitHub
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git push -u origin feature/your-feature-name
    ```
    - The `-u` flag sets up upstream tracking so future pushes can use `git push`
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Look in the main content area (you'll see "No local changes" message)
+   - Click the **"Publish branch"** button
+   - GitHub Desktop will ask if you want to create a pull request
+   - You can create the PR now or do it later on GitHub
+   </details>
 
 4. **Switch back to main and verify it's clean:**
+   - Confirm that main no longer has your changes
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git checkout main
    git status
    ```
    - Main should now be clean (no uncommitted changes)
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Click the **"Current branch"** dropdown
+   - Select **"main"**
+   - Check the left sidebar - it should show "No local changes"
+   - Your changes are now safely on your feature branch
+   </details>
 
 5. **Create a Pull Request** from your feature branch as normal
 
@@ -638,14 +846,35 @@ Use this if you have uncommitted changes but haven't committed anything to main 
 
 Use this if you have already committed changes to your local main branch.
 
-1. **Create a new branch from main** (this includes your commits and any uncommitted changes):
+1. **Create a new branch from main**
+   - This moves your commits and any uncommitted changes to the new branch
+   - Your commits are now on this new branch
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git checkout -b feature/your-feature-name
    ```
-   - Your commits are now on this new branch
-   - Any uncommitted changes also come with you
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Click the **"Current branch"** dropdown
+   - Click **"New branch"**
+   - Enter your branch name: `feature/your-feature-name`
+   - Make sure **"main"** is selected as the base branch
+   - Click **"Create branch"**
+   - Your commits and uncommitted changes are now on this new branch
+   </details>
 
-3. **If you have uncommitted changes, commit them now:**
+2. **If you have uncommitted changes, commit them now:**
+   - Ensure all your work is committed before proceeding
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    # Add specific files you changed (recommended)
    git add path/to/file1.java path/to/file2.java
@@ -655,36 +884,108 @@ Use this if you have already committed changes to your local main branch.
    git commit -m "Your commit message"
    ```
    - **Note:** Use `git add .` only if you're certain all files in the directory should be committed
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - If you see files in the "Changes" section, review and commit them
+   - Check the files you want to commit
+   - Write a commit message:
+     - **Summary** (required): Short description of your changes
+     - **Description** (optional): Add more details if needed
+   - Click **"Commit to [branch-name]"**
+   </details>
 
-4. **Verify all changes are committed:**
+3. **Verify all changes are committed:**
+   - Make sure everything is saved before resetting main
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git status
    ```
    - You should see: `nothing to commit, working tree clean`
-   - If you see any uncommitted changes, repeat step 3 to commit them
-   - This ensures all your work is safely committed before proceeding
+   - If you see any uncommitted changes, repeat step 2 to commit them
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Check the left sidebar
+   - It should show "No local changes"
+   - If you see files listed, commit them first
+   </details>
 
-5. **Switch back to main:**
+4. **Switch back to main:**
+   - Return to main so we can reset it
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git checkout main
    ```
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Click the **"Current branch"** dropdown
+   - Select **"main"**
+   </details>
 
-6. **Reset main to match the remote** (this removes your commits from local main):
+5. **Reset main to match the remote**
+   - This removes your commits from local main (they're safe on your feature branch)
+   - ⚠️ **Warning**: This removes your commits from local main, but they're safe on your feature branch
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git reset --hard origin/main
    ```
-   - ⚠️ **Warning**: This removes your commits from local main, but they're safe on your feature branch
    - This also removes any uncommitted changes from main (they're on your feature branch)
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Click **"Branch"** in the menu bar
+   - Select **"Update from [remote]/main"** or **"Discard all changes"**
+   - This will reset your local main to match the remote
+   - **Note**: Your commits are safe on your feature branch
+   </details>
 
-7. **Push your feature branch:**
+6. **Push your feature branch:**
+   - Upload your branch to GitHub
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git checkout feature/your-feature-name
    git push -u origin feature/your-feature-name
    ```
    - The `-u` flag sets up "upstream tracking" so you can use `git push` in the future
-   - After the first push, you can just use `git push` (no need to specify the remote and branch)
+   - After the first push, you can just use `git push`
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Switch back to your feature branch (click branch dropdown, select your feature branch)
+   - Look in the main content area and click the **"Publish branch"** button
+   - GitHub Desktop will ask if you want to create a pull request
+   </details>
 
-8. **Verify main is clean:**
+7. **Verify main is clean:**
+   - Confirm that main is back to its original state
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
    ```bash
    git checkout main
    git status
@@ -701,8 +1002,18 @@ Use this if you have already committed changes to your local main branch.
    ```
    - You should see your commits (the ones you wanted to move) listed here
    - This confirms your work is on the feature branch where it belongs
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Make sure you're on the main branch
+   - Check the left sidebar - it should show "No local changes"
+   - Check the commit history - it should match what you see on GitHub
+   - Switch to your feature branch to verify your commits are there
+   </details>
 
-9. **Create a Pull Request** from your feature branch as normal
+8. **Create a Pull Request** from your feature branch as normal
 
 **Prevention Tips:**
 - Always check your branch before starting work: `git branch`
@@ -731,9 +1042,35 @@ Use this if you have already committed changes to your local main branch.
 - Make sure all conversations are resolved
 
 ### "Merge conflicts"
-- Pull the latest main branch: `git checkout main && git pull`
-- Merge main into your branch: `git checkout feature/your-branch && git merge main`
-- Resolve conflicts, test, and push
+- Your branch has conflicts with the latest main branch
+- You need to merge main into your branch and resolve the conflicts
+   
+   <details>
+   <summary>Using Command Line</summary>
+   
+   ```bash
+   git checkout main
+   git pull origin main
+   git checkout feature/your-branch
+   git merge main
+   # Resolve conflicts in your editor, then:
+   git add .
+   git commit -m "Resolve merge conflicts"
+   git push
+   ```
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Switch to main branch and click **"Pull origin"** to get latest changes
+   - Switch back to your feature branch
+   - Click **"Branch"** → **"Merge into current branch"** → Select **"main"**
+   - GitHub Desktop will show conflicts if any exist
+   - Resolve conflicts using the conflict resolution tool
+   - Commit the merge resolution
+   - Push your branch
+   </details>
 
 ### "I need to update my PR"
 - Just push more commits to your branch
@@ -743,8 +1080,20 @@ Use this if you have already committed changes to your local main branch.
 ### "I accidentally worked on main branch"
 - Don't panic! Your changes aren't lost
 - See "Scenario 4: Accidentally Worked on Main Branch" above for detailed steps
-- Quick fix: `git checkout -b feature/your-branch` (moves uncommitted changes)
-- If already committed: Create branch, then reset main with `git reset --hard origin/main`
+   
+   <details>
+   <summary>Quick Fix - Using Command Line</summary>
+   
+   - If you have uncommitted changes: `git checkout -b feature/your-branch` (moves changes)
+   - If already committed: Create branch, then reset main with `git reset --hard origin/main`
+   </details>
+   
+   <details>
+   <summary>Quick Fix - Using GitHub Desktop</summary>
+   
+   - If you have uncommitted changes: Create a new branch (changes come with you)
+   - If already committed: Create a new branch from main, then reset main to match remote
+   </details>
 
 ### "I can push to main even though I have branch protection rules"
 - If you see "Bypassed rule violations" in the output, you're bypassing the rules because you're an admin/owner
@@ -769,6 +1118,19 @@ Remember: **Small, frequent merges are better than large, infrequent ones!**
 ## Quick Reference
 
 ### Daily Commands
+
+**Start work:**
+- Switch to main and get latest changes, then create a feature branch
+
+**During work:**
+- Make changes, commit frequently, push to your branch
+
+**After PR is merged:**
+- Switch to main, pull latest, delete local feature branch
+
+<details>
+<summary>Using Command Line</summary>
+
 ```bash
 # Start work
 git checkout main
@@ -787,6 +1149,20 @@ git checkout main
 git pull origin main
 git branch -d feature/your-feature  # Delete local branch
 ```
+</details>
+
+<details>
+<summary>Using GitHub Desktop</summary>
+
+**Start work:**
+- Switch to main branch → Pull origin → Create new branch
+
+**During work:**
+- Make changes → Review in GitHub Desktop → Commit → Push origin
+
+**After PR is merged:**
+- Switch to main → Pull origin → Delete local feature branch (right-click branch name → Delete)
+</details>
 
 ### GitHub Workflow
 1. Push branch → Create PR → Request review → Address feedback → Merge → Delete branch
