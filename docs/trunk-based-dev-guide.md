@@ -227,10 +227,15 @@ After you've pushed your branch to GitHub, you need to create a Pull Request (PR
    - Make changes to your code locally
    - Commit and push to the same branch:
      ```bash
-     git add .
+     # Add specific files you changed (safer)
+     git add path/to/file1.java path/to/file2.java
+     # OR if you only modified tracked files (not adding new files):
+     git add -u
+     # Then commit and push
      git commit -m "Address review feedback: improve error handling"
      git push
      ```
+   - **Note:** Avoid `git add .` unless you're certain there are no untracked files that shouldn't be committed
    - After the first push with `-u`, you can just use `git push` for subsequent commits
    - The PR will automatically update with your new commits
 
@@ -239,10 +244,66 @@ After you've pushed your branch to GitHub, you need to create a Pull Request (PR
    - If branch protection requires multiple approvals, wait for all required approvals
 
 5. **Merge the Pull Request**
-   - Once approved, click the green **"Merge pull request"** button
-   - Choose merge method (if linear history is required, use "Rebase and merge" or "Squash and merge")
-   - Confirm the merge
-   - Delete the branch after merging (GitHub will offer this option)
+   - Once approved, you'll see merge options near the bottom of the PR page
+   - Click the dropdown button (it may show "Squash and merge" or another merge method)
+   - Choose your merge method (note: not all options may be available - see below):
+     - **"Squash and merge"** - Combines all commits into one (recommended for clean history)
+       - Usually always available
+     - **"Rebase and merge"** - Replays commits on top of main (also keeps linear history)
+       - Available when the branch can be rebased cleanly (no conflicts)
+     - **"Create a merge commit"** - Creates a merge commit (preserves full branch history)
+       - **Common reason it's not available:** If your branch protection rule has **"Require linear history"** enabled (Settings → Branches → Branch protection rules), this will disable merge commits even if "Allow merge commits" is enabled in general settings
+       - **What "Require linear history" means:** This setting enforces a clean, linear commit history on the protected branch (like `main`). Merge commits create a "branching" history, so they're automatically disabled when this rule is active
+       - **For repository admins:** 
+         - General setting: **Settings → General → Pull Requests** (checkboxes for merge methods)
+         - Branch protection: **Settings → Branches → Branch protection rules** → Select your branch → Look for "Require linear history" checkbox
+         - Branch protection rules override general settings
+       - **For regular contributors:** You'll only see the merge options that are actually available based on both settings
+       - **If "Create a merge commit" doesn't appear:** Your repository is configured to require linear history (common for teams wanting clean commit history)
+   
+   **How the end result differs:**
+   
+   Imagine your feature branch has 3 commits:
+   - `Commit A: "Add arm subsystem"`
+   - `Commit B: "Fix arm PID tuning"`
+   - `Commit C: "Update arm documentation"`
+   
+   And main currently has:
+   - `Commit 1: "Initial robot code"`
+   - `Commit 2: "Add drive base"`
+   
+   **After "Squash and merge":**
+   ```
+   main: Commit 1 → Commit 2 → [Single commit: "Add arm subsystem, fix PID, update docs"]
+   ```
+   - All 3 commits become ONE commit on main
+   - Clean, simple history
+   - Individual commit messages are lost (but PR description is preserved)
+   
+   **After "Rebase and merge":**
+   ```
+   main: Commit 1 → Commit 2 → Commit A → Commit B → Commit C
+   ```
+   - All 3 commits appear individually on main
+   - Linear history (no merge commit)
+   - Each commit keeps its original message
+   
+   **After "Create a merge commit":**
+   ```
+   main: Commit 1 → Commit 2 → [Merge commit] ← (points to Commit A, B, C)
+   ```
+   - Creates a merge commit that combines the branches
+   - Preserves the branch structure
+   - Shows that commits A, B, C came from a feature branch
+   
+   **Important:** The feature branch can be safely deleted after ANY merge method. When you merge:
+   - Git copies all commits from the feature branch into main's history
+   - The commits become part of main - they don't depend on the feature branch existing
+   - The merge commit (if used) just records that a merge happened, but the actual commits are now in main
+   - Deleting the feature branch doesn't affect main at all - all your work is safely in main
+   
+   - Click the merge button to confirm
+   - Delete the branch after merging (GitHub will offer this option - recommended to keep the repository clean)
 
 ### Pull Request Best Practices
 
@@ -547,9 +608,14 @@ Use this if you have uncommitted changes but haven't committed anything to main 
 
 2. **Commit your changes on the new branch:**
    ```bash
-   git add .
+   # Add specific files you changed (recommended)
+   git add path/to/file1.java path/to/file2.java
+   # OR if you only modified tracked files:
+   git add -u
+   # Then commit
    git commit -m "Your commit message"
    ```
+   - **Note:** Use `git add .` only if you're certain all files in the directory should be committed
 
 3. **Push the new branch:**
    ```bash
@@ -581,9 +647,14 @@ Use this if you have already committed changes to your local main branch.
 
 3. **If you have uncommitted changes, commit them now:**
    ```bash
-   git add .
+   # Add specific files you changed (recommended)
+   git add path/to/file1.java path/to/file2.java
+   # OR if you only modified tracked files:
+   git add -u
+   # Then commit
    git commit -m "Your commit message"
    ```
+   - **Note:** Use `git add .` only if you're certain all files in the directory should be committed
 
 4. **Verify all changes are committed:**
    ```bash
@@ -705,7 +776,8 @@ git pull origin main
 git checkout -b feature/your-feature
 
 # During work
-git add .
+git add path/to/changed/file.java  # Add specific files (safer)
+# OR: git add -u  # Only modified tracked files
 git commit -m "Clear commit message"
 git push -u origin feature/your-feature  # First push only (sets up tracking)
 # After first push, just use: git push

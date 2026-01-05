@@ -6,6 +6,7 @@ This repository contains:
 * Tutorials
 
 This line crerates a merge conflict with branch A (Change B)
+Adding this to intentionally create a merge conflict!!! (Change A)
 
 ## Trunk Based Development
 See `docs/trunk-based-dev-guide.md` for information about trunk based development.  This documentation describes
