@@ -5,6 +5,7 @@ This repository contains:
 * Process documentation
 * Tutorials
 
+This line crerates a merge conflict with branch A (Change B)
 Adding this to intentionally create a merge conflict!!! (Change A)
 
 ## Trunk Based Development
