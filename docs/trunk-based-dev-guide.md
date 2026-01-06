@@ -1,5 +1,46 @@
 # Trunk-Based Development Guide for FRC Robotics
 
+## Table of Contents
+
+- [What is Trunk-Based Development?](#what-is-trunk-based-development)
+- [Core Principles](#core-principles)
+- [Benefits for FRC Teams](#benefits-for-frc-teams)
+  - [Reduced Merge Conflicts](#1-reduced-merge-conflicts)
+  - [Faster Feedback](#2-faster-feedback)
+  - [Always Deployable](#3-always-deployable)
+  - [Better Collaboration](#4-better-collaboration)
+  - [Simpler Workflow](#5-simpler-workflow)
+- [Workflow Procedures](#workflow-procedures)
+  - [Daily Workflow](#daily-workflow)
+  - [Branch Naming Conventions](#branch-naming-conventions)
+  - [Commit Message Guidelines](#commit-message-guidelines)
+- [Creating a Pull Request](#creating-a-pull-request)
+  - [Step-by-Step Instructions](#step-by-step-instructions)
+  - [After Creating the Pull Request](#after-creating-the-pull-request)
+  - [Pull Request Best Practices](#pull-request-best-practices)
+  - [Pull Request Template](#pull-request-template-optional)
+- [Configuring GitHub for Required Code Reviews](#configuring-github-for-required-code-reviews)
+  - [Step 1: Navigate to Repository Settings](#step-1-navigate-to-repository-settings)
+  - [Step 2: Add Branch Protection Rule](#step-2-add-branch-protection-rule)
+  - [Step 3: Verify the Protection Rule](#step-3-verify-the-protection-rule)
+  - [Additional Configuration Options](#additional-configuration-options)
+- [Setting Up CI/CD with GitHub Actions](#setting-up-cicd-with-github-actions)
+  - [Step 1: Create GitHub Actions Workflow File](#step-1-create-github-actions-workflow-file)
+  - [Step 2: Verify the Workflow Works](#step-2-verify-the-workflow-works)
+  - [Step 3: Configure Branch Protection to Require CI Checks](#step-3-configure-branch-protection-to-require-ci-checks)
+  - [Step 4: Test the Complete Flow](#step-4-test-the-complete-flow)
+- [Best Practices for FRC Teams](#best-practices-for-frc-teams)
+- [Common Scenarios](#common-scenarios)
+  - [Scenario 1: Multiple People Working on the Same Feature](#scenario-1-multiple-people-working-on-the-same-feature)
+  - [Scenario 2: Urgent Bug Fix During Competition](#scenario-2-urgent-bug-fix-during-competition)
+  - [Scenario 3: Large Refactoring](#scenario-3-large-refactoring)
+  - [Scenario 4: Accidentally Worked on Main Branch](#scenario-4-accidentally-worked-on-main-branch)
+    - [Solution A: Uncommitted Changes Only](#solution-a-uncommitted-changes-only)
+    - [Solution B: Commits on Main Branch](#solution-b-commits-on-main-branch)
+- [Troubleshooting](#troubleshooting)
+- [Summary](#summary)
+- [Quick Reference](#quick-reference)
+
 ## What is Trunk-Based Development?
 
 Trunk-based development is a version control strategy where all developers work on a single branch (usually called "main") and integrate their changes frequently. Instead of maintaining long-lived feature branches, developers create short-lived branches for their work and merge them back to main quickly after code review.
@@ -27,6 +68,7 @@ Trunk-based development is a version control strategy where all developers work 
 - Main branch is always ready to deploy to the robot
 - No need to wait for "feature complete" branches
 - Easy to test the latest code on the robot
+- **Requires CI/CD**: Automated checks ensure code compiles and tests pass before merging (see [Setting Up CI/CD with GitHub Actions](#setting-up-cicd-with-github-actions))
 
 ### 4. **Better Collaboration**
 - Team members stay in sync with each other's changes
@@ -549,15 +591,40 @@ If you want multiple team members to review code:
 
 Create a `.github/CODEOWNERS` file to automatically request reviews from specific team members:
 
+**Important:** The `@` references in CODEOWNERS files must be:
+- **GitHub usernames** (e.g., `@johndoe`, `@janedoe`)
+- **GitHub team names** (if using GitHub Organizations, e.g., `@your-org/drive-team`)
+- **NOT** aliases or custom names - they must match actual GitHub accounts
+
+**Example CODEOWNERS file:**
+
 ```
 # Robot subsystems
-/src/main/java/frc/robot/subsystems/drivetrain/ @team-lead @drive-team
-/src/main/java/frc/robot/subsystems/arm/ @team-lead @arm-team
-/src/main/java/frc/robot/commands/autonomous/ @team-lead @autonomous-team
+/src/main/java/frc/robot/subsystems/drivetrain/ @johndoe @janedoe
+/src/main/java/frc/robot/subsystems/arm/ @johndoe @bobsmith
+/src/main/java/frc/robot/commands/autonomous/ @johndoe @alicejones
 
 # All code requires at least one review
-* @team-lead
+* @johndoe
 ```
+
+**If using GitHub Organizations with teams:**
+
+If your repository is part of a GitHub Organization, you can reference teams:
+
+```
+# Robot subsystems
+/src/main/java/frc/robot/subsystems/drivetrain/ @your-org/team-leads @your-org/drive-team
+/src/main/java/frc/robot/subsystems/arm/ @your-org/team-leads @your-org/arm-team
+
+# All code requires at least one review
+* @your-org/team-leads
+```
+
+ **How it works:**
+- When someone creates a PR that changes files in `/src/main/java/frc/robot/subsystems/drivetrain/`, GitHub automatically requests reviews from `@johndoe` and `@janedoe`
+- The `*` pattern at the end means "all other files" and ensures `@johndoe` is requested for any file not covered by specific rules
+- Rules are processed top-to-bottom, so more specific paths should come before the catch-all `*` rule
 
 #### Status Checks
 
@@ -565,6 +632,347 @@ If you set up continuous integration (CI):
 - Configure GitHub Actions or other CI tools
 - Require tests to pass before merging
 - This ensures code quality and prevents broken builds
+
+## Setting Up CI/CD with GitHub Actions
+
+Continuous Integration/Continuous Deployment (CI/CD) is essential for maintaining the "Always Deployable" principle. A CI/CD pipeline automatically verifies that code compiles and tests pass before allowing it to be merged to main. This prevents broken code from reaching the main branch and ensures the codebase is always ready to deploy to the robot.
+
+**CI/CD runs on both main and feature branches:**
+- **On feature branches**: Gives developers immediate feedback when they push code, catching issues early
+- **On pull requests**: Ensures code is verified before merging to main
+- **On main branch**: Validates that main stays healthy after merges
+
+This dual approach ensures quality throughout the development process, not just at merge time.
+
+### Why CI/CD is Critical for "Always Deployable"
+
+Without automated checks:
+- ❌ Broken code can be merged if reviewers miss compilation errors
+- ❌ Tests might not be run consistently before merging
+- ❌ Main branch can become broken, blocking all team members
+- ❌ No automated verification that code is actually deployable
+
+With CI/CD:
+- ✅ Every PR is automatically checked for compilation errors
+- ✅ Tests run automatically on every change
+- ✅ Main branch stays healthy and deployable
+- ✅ Issues are caught before they reach main
+
+### Step 1: Create GitHub Actions Workflow File
+
+1. **Create the workflow directory structure:**
+   - In your repository root, create `.github/workflows/` directory (if it doesn't exist)
+   - Create a file named `ci.yml` (or `ci.yaml`) in that directory
+
+   <details>
+   <summary>Using Command Line</summary>
+   
+   ```bash
+   mkdir -p .github/workflows
+   touch .github/workflows/ci.yml
+   ```
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - Create a new branch: `feature/setup-ci`
+   - In your file explorer or IDE, navigate to your repository root
+   - Create the `.github` folder (if it doesn't exist)
+   - Inside `.github`, create a `workflows` folder
+   - Inside `workflows`, create a new file named `ci.yml`
+   </details>
+
+2. **Add the CI workflow configuration:**
+
+   Copy this workflow configuration into `.github/workflows/ci.yml`:
+
+   ```yaml
+   name: CI
+
+   on:
+     pull_request:
+       branches: [ main ]
+     push:
+
+   jobs:
+     build:
+       runs-on: ubuntu-latest
+       
+       steps:
+       - name: Checkout code
+         uses: actions/checkout@v4
+         
+       - name: Set up JDK 17
+         uses: actions/setup-java@v4
+         with:
+           java-version: '17'
+           distribution: 'temurin'
+           
+       - name: Grant execute permission for gradlew
+         run: chmod +x gradlew
+         
+       - name: Build with Gradle
+         run: ./gradlew build
+         
+       - name: Run tests
+         run: ./gradlew test
+         
+       - name: Upload test results
+         if: always()
+         uses: actions/upload-artifact@v4
+         with:
+           name: test-results
+           path: build/test-results/test/
+           retention-days: 7
+   ```
+
+   **What this workflow does:**
+   - **Triggers**: 
+     - Runs on every pull request to main (catches issues before merging)
+     - Runs on every push to any branch (gives immediate feedback to developers)
+   - **Skipping CI on feature branches:**
+     - If you need to push work-in-progress code that has issues, add `[skip ci]` or `[ci skip]` to your commit message
+     - Example: `git commit -m "WIP: fixing encoder issue [skip ci]"`
+     - **Note**: CI will still run on pull requests (PRs are always checked before merging)
+   - **Why run on feature branches?**
+     - ✅ Developers get immediate feedback when they push code
+     - ✅ Issues are caught early, before creating a PR
+     - ✅ Prevents broken code from sitting in remote branches
+     - ✅ Helps maintain code quality throughout development
+   - **Build step**: Compiles your code using Gradle (catches compilation errors)
+   - **Test step**: Runs all JUnit tests (if you have any)
+   - **Artifact upload**: Saves test results for review (even if tests fail)
+
+   **Skipping CI when needed:**
+   
+   Sometimes you need to push work-in-progress code that has temporary issues (e.g., incomplete refactoring, debugging code, or code you're still working on). You can skip CI by adding `[skip ci]` or `[ci skip]` to your commit message:
+   
+   ```bash
+   git commit -m "WIP: refactoring drive subsystem [skip ci]"
+   ```
+   
+   **Important notes:**
+   - ⚠️ CI skipping only works for pushes to feature branches
+   - ✅ CI will **always run** on pull requests (PRs must be checked before merging)
+   - ✅ Use sparingly - only when you truly need to push incomplete work
+   - ✅ Remove `[skip ci]` from your commit message once the code is ready
+   
+   **When to use `[skip ci]`:**
+   - ✅ Pushing work-in-progress code to backup your work
+   - ✅ Sharing incomplete code with teammates for collaboration
+   - ✅ Code has temporary issues you're actively fixing
+   
+   **When NOT to use `[skip ci]`:**
+   - ❌ Don't use it on pull requests (PRs are always checked)
+   - ❌ Don't use it just because tests are failing - fix the tests instead
+   - ❌ Don't use it habitually - CI helps catch issues early
+
+3. **Commit and push the workflow file:**
+   - Commit the new `.github/workflows/ci.yml` file
+   - Push to your branch
+   - Create a PR to merge it to main
+
+   <details>
+   <summary>Using Command Line</summary>
+   
+   ```bash
+   git add .github/workflows/ci.yml
+   git commit -m "Add CI workflow for automated build and test checks"
+   git push
+   ```
+   </details>
+   
+   <details>
+   <summary>Using GitHub Desktop</summary>
+   
+   - The new file should appear in the "Changes" section
+   - Check the box next to `.github/workflows/ci.yml`
+   - Write a commit message: "Add CI workflow for automated build and test checks"
+   - Click "Commit to [branch-name]"
+   - Click "Push origin"
+   </details>
+
+### Step 2: Verify the Workflow Works
+
+1. **After merging the PR with the workflow file:**
+   - Go to your repository on GitHub
+   - Click on the **"Actions"** tab at the top
+   - You should see a workflow run (it may have run automatically when you merged)
+   - Click on the workflow run to see the details
+
+2. **Test the workflow:**
+   - Create a test branch and make a small change
+   - Create a PR from that branch
+   - Go to the PR page and scroll down
+   - You should see a "Checks" section showing the CI workflow running
+   - Wait for it to complete (usually takes 1-3 minutes)
+
+3. **Verify checks appear:**
+   - If the build succeeds, you'll see a green checkmark ✅
+   - If it fails, you'll see a red X ❌
+   - Click on "Details" to see what failed
+
+### Step 3: Configure Branch Protection to Require CI Checks
+
+Now that CI is set up, configure branch protection to require these checks to pass before merging:
+
+1. **Navigate to branch protection settings:**
+   - Go to your repository on GitHub
+   - Click **Settings** → **Branches**
+   - Find your branch protection rule for `main` (or create one if you haven't yet)
+   - Click **Edit** on the existing rule
+
+2. **Enable status check requirements:**
+   - Scroll down to **"Require status checks to pass before merging"**
+   - Check the box to enable it
+   - You should see a list of available status checks
+   - Check the boxes for:
+     - ✅ **build** (the build job from your workflow)
+     - ✅ **test** (if you have tests, or you can skip this until you add tests)
+
+3. **Additional recommended settings:**
+   - ✅ **Require branches to be up to date before merging**
+     - This ensures PRs are tested against the latest main branch
+     - Prevents merging code that worked when created but breaks with recent changes
+
+4. **Save the changes**
+
+### Step 4: Test the Complete Flow
+
+1. **Create a test PR that should fail:**
+   - Create a branch with a syntax error (e.g., add `public class Broken {` without closing brace)
+   - Create a PR
+   - The CI should fail
+   - Try to merge - it should be blocked with a message like "Required status check 'build' is pending"
+
+2. **Fix the error and verify it passes:**
+   - Fix the syntax error
+   - Push the fix
+   - CI should pass
+   - Now you should be able to merge (assuming you have approvals)
+
+### Understanding CI Workflow Results
+
+**In Pull Requests:**
+- You'll see a "Checks" section at the bottom of the PR
+- Shows the status of all required checks
+- Green ✅ = All checks passed
+- Red ❌ = One or more checks failed
+- Yellow ⏳ = Checks are still running
+
+**In the Actions Tab:**
+- Click "Actions" tab to see all workflow runs
+- Click on a run to see detailed logs
+- Useful for debugging why builds or tests failed
+
+### Adding Tests to Your Project
+
+If you don't have tests yet, you can start small:
+
+1. **Create a test directory structure:**
+   ```
+   src/test/java/frc/robot/
+   ```
+
+2. **Create a simple test file:**
+   ```java
+   package frc.robot;
+   
+   import org.junit.jupiter.api.Test;
+   import static org.junit.jupiter.api.Assertions.*;
+   
+   public class ExampleTest {
+       @Test
+       public void testBasicMath() {
+           assertEquals(2 + 2, 4);
+       }
+   }
+   ```
+
+3. **Run tests locally:**
+   ```bash
+   ./gradlew test
+   ```
+
+4. **Once you have tests, the CI workflow will automatically run them**
+
+### Troubleshooting CI/CD
+
+**"Workflow not running"**
+- Make sure the `.github/workflows/ci.yml` file is on the main branch
+- Check that the file is in the correct location: `.github/workflows/ci.yml`
+- Verify the YAML syntax is correct (no indentation errors)
+
+**"Build fails but works locally"**
+- Check the workflow logs in the Actions tab
+- Common issues:
+  - Different Java version (workflow uses Java 17)
+  - Missing dependencies
+  - Platform-specific code (Windows vs Linux)
+
+**"Tests fail in CI but pass locally"**
+- Make sure you're running the same Gradle command: `./gradlew test`
+- Check for hardcoded file paths that might differ
+- Verify test dependencies are correctly configured
+
+**"Status checks not showing in PR"**
+- Make sure the workflow file is on the main branch
+- The workflow must run at least once before it appears as a required check
+- Check that branch protection is configured correctly
+
+### Advanced: Customizing Your CI Workflow
+
+You can customize the workflow for your team's needs:
+
+**Add code formatting checks:**
+```yaml
+- name: Check code formatting
+  run: ./gradlew spotlessCheck
+```
+
+**Add multiple Java versions:**
+```yaml
+strategy:
+  matrix:
+    java-version: ['17', '21']
+```
+
+**Run on multiple operating systems:**
+```yaml
+strategy:
+  matrix:
+    os: [ubuntu-latest, windows-latest, macos-latest]
+```
+
+**Cache Gradle dependencies (faster builds):**
+```yaml
+- name: Cache Gradle packages
+  uses: actions/cache@v3
+  with:
+    path: |
+      ~/.gradle/caches
+      ~/.gradle/wrapper
+    key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+    restore-keys: |
+      ${{ runner.os }}-gradle-
+```
+
+### Summary
+
+Setting up CI/CD ensures:
+- ✅ Code compiles before merging
+- ✅ Tests pass (if you have them)
+- ✅ Main branch stays deployable
+- ✅ Issues are caught early
+- ✅ Team can deploy with confidence
+
+**Next Steps:**
+1. Set up the CI workflow (Step 1)
+2. Verify it works (Step 2)
+3. Require checks in branch protection (Step 3)
+4. Start adding tests incrementally
+5. Customize workflow as needed
 
 ## Best Practices for FRC Teams
 
