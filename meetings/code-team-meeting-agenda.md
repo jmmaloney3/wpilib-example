@@ -28,6 +28,7 @@
      - 5.3.4 [Merge Conflicts](#534-merge-conflicts)
    - 5.4 [Quality Assurance](#54-quality-assurance)
      - 5.4.1 [Code Quality Gates](#541-code-quality-gates)
+     - 5.4.2 [Continuous Integration/Continuous Deployment (CI/CD)](#542-continuous-integrationcontinuous-deployment-cicd)
    - 5.5 [Deployment Process](#55-deployment-process)
 6. [Configuration Management](#6-configuration-management)
    - 6.1 [File Management](#61-file-management)
@@ -470,6 +471,132 @@ This is an optional practice that teams can adopt based on their needs and team 
 - **Spotless** - Require passing Spotless before merging to main?
 - Automated checks in CI/CD pipeline
 - What blocks a merge? (Tests, linting, reviews)
+
+#### 5.4.2 Continuous Integration/Continuous Deployment (CI/CD)
+
+**What is CI/CD?**
+
+Continuous Integration/Continuous Deployment (CI/CD) is an automated process that validates code quality before it reaches the main branch. A CI/CD pipeline automatically:
+- Compiles code to catch compilation errors
+- Runs automated tests (if you have them)
+- Verifies code quality checks (formatting, linting, etc.)
+- Prevents broken code from being merged to main
+
+**Why CI/CD is Critical for "Always Deployable"**
+
+Without automated checks:
+- ❌ Broken code can be merged if reviewers miss compilation errors
+- ❌ Tests might not be run consistently before merging
+- ❌ Main branch can become broken, blocking all team members
+- ❌ No automated verification that code is actually deployable
+
+With CI/CD:
+- ✅ Every PR is automatically checked for compilation errors
+- ✅ Tests run automatically on every change
+- ✅ Main branch stays healthy and deployable
+- ✅ Issues are caught before they reach main
+- ✅ Developers get immediate feedback when they push code
+
+**How CI/CD Works**
+
+The CI/CD pipeline runs automatically:
+- **On feature branches**: Gives developers immediate feedback when they push code, catching issues early
+- **On pull requests**: Ensures code is verified before merging to main
+- **On main branch**: Validates that main stays healthy after merges
+
+**Proposed CI/CD Configuration**
+
+The following GitHub Actions workflow file (`.github/workflows/ci.yml`) provides automated build and test validation:
+
+```yaml
+name: CI
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # Skip CI if commit message contains [skip ci] or [ci skip] (only for push events, not PRs)
+    if: |
+      github.event_name == 'pull_request' || 
+      !contains(github.event.head_commit.message, '[skip ci]') && 
+      !contains(github.event.head_commit.message, '[ci skip]')
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+      
+    - name: Build with Gradle
+      run: ./gradlew build
+      
+    - name: Run tests
+      run: ./gradlew test
+      
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: build/test-results/test/
+        retention-days: 7
+```
+
+**What This Workflow Does:**
+
+1. **Triggers**: 
+   - Runs on every pull request to main (catches issues before merging)
+   - Runs on every push to any branch (gives immediate feedback to developers)
+   - Can be skipped on feature branches by adding `[skip ci]` to commit message (PRs always run)
+
+2. **Build Step**: Compiles your code using Gradle (catches compilation errors)
+
+3. **Test Step**: Runs all JUnit tests (if you have any)
+
+4. **Artifact Upload**: Saves test results for review (even if tests fail)
+
+**Integration with Branch Protection:**
+
+Once CI/CD is set up, you can configure branch protection rules to:
+- Require CI checks to pass before merging
+- Block merges if builds fail
+- Ensure main branch stays deployable
+
+**Skipping CI When Needed:**
+
+Developers can skip CI on feature branches (but not on PRs) by adding `[skip ci]` to their commit message:
+```bash
+git commit -m "WIP: fixing encoder issue [skip ci]"
+```
+
+This allows pushing work-in-progress code without triggering builds, while still ensuring PRs are always checked.
+
+**Requirements:**
+
+- `.wpilib/wpilib_preferences.json` must be tracked in git (contains team number required by Gradle build)
+- See `docs/trunk-based-dev-guide.md` for detailed setup instructions
+
+**Decision Points:**
+- Will we adopt CI/CD for automated code validation?
+- Should CI checks be required before merging to main? (Recommended: Yes)
+- What should trigger CI? (All pushes? Only PRs? Both?)
+- Should we allow skipping CI on feature branches? (Useful for work-in-progress code)
+- What checks should run? (Build only? Build + tests? Build + tests + formatting?)
+- Who is responsible for maintaining the CI/CD pipeline?
+
+**Reference:**
+- See `docs/trunk-based-dev-guide.md` section "Setting Up CI/CD with GitHub Actions" for detailed setup instructions
 
 ### 5.5 Deployment Process
 - **Before submitting to Git:**
@@ -1497,11 +1624,12 @@ This aligns with trunk-based development principles when combined with short-liv
 
 1. **Branching strategy** - Feature branches + PRs vs. direct commits
 2. **Code review requirements** - Who reviews? Required approvals?
-3. **Code quality gates** - Spotless? Automated tests? What blocks merge?
-4. **Testing strategy** - What can be automated? Simulator usage?
-5. **Stand-up meetings** - Frequency and format
-6. **Mentor involvement** - Roles and how it changes over time
-7. **Hot fix process** - How to handle urgent fixes during matches
+3. **CI/CD pipeline** - Will we adopt automated build and test validation?
+4. **Code quality gates** - Spotless? Automated tests? What blocks merge?
+5. **Testing strategy** - What can be automated? Simulator usage?
+6. **Stand-up meetings** - Frequency and format
+7. **Mentor involvement** - Roles and how it changes over time
+8. **Hot fix process** - How to handle urgent fixes during matches
 
 ---
 
@@ -1510,7 +1638,7 @@ This aligns with trunk-based development principles when combined with short-liv
 1. Document decisions in team wiki/docs
 2. Set up GitHub branch protection rules (if using feature branches)
 3. Create PR template
-4. Set up CI/CD pipeline (even if just build checks initially)
+4. Set up CI/CD pipeline (if decided - see section 5.4.2 for details)
 5. Create test checklist/script
 6. Set up Spotless (if decided)
 7. Create code owners file (if using code owners)
