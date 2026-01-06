@@ -31,7 +31,9 @@ bin/
 # .vscode/
 
 # WPILib
-.wpilib/
+.wpilib/*
+# But track wpilib_preferences.json (needed for CI/CD builds)
+!.wpilib/wpilib_preferences.json
 
 # Simulator runtime files
 networktables.json

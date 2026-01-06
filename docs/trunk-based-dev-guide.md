@@ -904,6 +904,15 @@ If you don't have tests yet, you can start small:
 - Check that the file is in the correct location: `.github/workflows/ci.yml`
 - Verify the YAML syntax is correct (no indentation errors)
 
+**"Build fails with 'Could not find team number'"**
+- The `.wpilib/wpilib_preferences.json` file must be tracked in git for CI/CD to work
+- This file contains the team number required by the Gradle build
+- **Solution**: 
+  1. Make sure `.gitignore` allows this file (it should have `!.wpilib/wpilib_preferences.json`)
+  2. Add the file to git: `git add -f .wpilib/wpilib_preferences.json`
+  3. Commit and push the file
+- **Note**: Other files in `.wpilib/` remain ignored (only `wpilib_preferences.json` is tracked)
+
 **"Build fails but works locally"**
 - Check the workflow logs in the Actions tab
 - Common issues:
