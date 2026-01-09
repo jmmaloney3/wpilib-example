@@ -30,6 +30,8 @@ A **capability tree** captures what your robot must do, organized hierarchically
 
 **Why it matters:** The capability tree ensures you're building the right things. It helps prioritize work and ensures nothing gets missed. Commands implement leaf-level capabilities, and user stories reference these capabilities.
 
+> **Note:** The capability tree is likely the same as the team's **"Robot WILL List"**—a prioritized list of capabilities (what the robot **WILL** do) generated during the strategy definition stage that starts at Kickoff. The Robot WILL List is a team-wide artifact that applies to mechanical, electronics, code, and operations teams, ensuring all teams work from the same prioritized list of capabilities. We're waiting for more information from coaches and mentors to confirm the exact relationship and format of the Robot WILL List.
+
 ### System Architecture (Subsystems)
 
 The **system architecture** document captures hardware ownership. It lists each subsystem and the hardware it controls. This is a stable artifact—it doesn't change as often as user stories.
