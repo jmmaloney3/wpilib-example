@@ -20,6 +20,8 @@ For step-by-step workflows, see the [Trunk-Based Development Guide](trunk-based-
 - [Understanding Git Terminology](#understanding-git-terminology)
 
 ---
+## Git Overview
+[Team 2052 Git Training](https://www.team2052.com/wiki/Programming/Git_Training/)
 
 ## Switch to a Branch (checkout)
 
